@@ -417,7 +417,7 @@ extension SwipeController: SwipeActionsViewDelegate {
             switch style {
             case .delete:
                 actionsContainerView.mask = actionsView.createDeletionMask() 
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.2, animations: {
                     guard let actionsContainerView = self.actionsContainerView else { return }
                     
                     actionsContainerView.center.x = newCenter
@@ -430,28 +430,17 @@ extension SwipeController: SwipeActionsViewDelegate {
                 }) { [weak self] _ in
                     self?.actionsContainerView?.mask = nil
                     self?.reset()
+                    action.handler?(action, indexPath)
                 }
             case .reset:
                 self.hideSwipe(animated: true)
             }
         }
         
-        let invokeAction = {
-            action.handler?(action, indexPath)
-            
+        animate(duration: 0.2, toOffset: newCenter) { _ in
             if let style = fillOption.autoFulFillmentStyle {
                 action.fulfill(with: style)
             }
-        }
-        
-        animate(duration: 0.3, toOffset: newCenter) { _ in
-            if fillOption.timing == .after {
-                invokeAction()
-            }
-        }
-        
-        if fillOption.timing == .with {
-            invokeAction()
         }
     }
     
